@@ -21,9 +21,21 @@ change the size of this tiny world and have data displayed about this world.
 Link to demo:
 
   https://ecstatic-carson-1a1222.netlify.app/
-  
+
 ## Screenshots
 
 ![App Screenshot](https://i.pinimg.com/originals/e7/07/91/e70791c9d626e86d20bfeb691582dad6.jpg)
 
-  
+
+
+## Available Scripts
+
+In the project directory, you can run:
+
+### `npm start`
+
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+
+The page will reload if you make edits.\
+You will also see any lint errors in the console.
