@@ -1,0 +1,2 @@
+# bitso-test
+In this challenge, we want you to create a web application with React in which the user will be presented with a small sea world where the user can build islands. This tiny world will be represented by a grid that starts as all sea and then the user can click on the world and add or remove land and create tiny islands. The user will need to be able to change the size of this tiny world and have data displayed about this world.
