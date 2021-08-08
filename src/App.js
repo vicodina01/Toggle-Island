@@ -5,6 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
+import { searchParentsGrid, processIslands } from './utils/commonUtils.js';
 
 import './App.css';
 
@@ -29,11 +30,11 @@ function App() {
 
   useEffect(() => {
     const createGrid = () => {
-      const arr = new Array(cols);
+      const arr = new Array(rows);
       let countEmpty = 0;
-      for (var i = 0; i < cols; i++) {
-        arr[i] = new Array(rows);
-        for (var j = 0; j < rows; j++) {
+      for (var i = 0; i < rows; i++) {
+        arr[i] = new Array(cols);
+        for (var j = 0; j < cols; j++) {
           const newCell = { ...cell };
           arr[i][j] = newCell;
           arr[i][j].id = i + "_" + j;
@@ -49,80 +50,44 @@ function App() {
 
   }, [rows, cols])
 
-  useEffect(() => {
-    console.log(totalIslands)
+  useEffect(() => {  
   }, [totalIslands])
 
   //Toggle cell
   const toggleCell = (id) => {
-    let currentIsland;
-    let haveParents = false;
 
     //get current cell data
     const currentCell = getCurrentCell(id);
 
     //search parents data
-    const searchParents = searchParentsCell(id);
+    const searchParents = searchParentsGrid(grid, rows, cols, id);
     const countParents = searchParents.countParents;
-
-    const parentTop = searchParents.parentTop;
-    const parentLeft = searchParents.parentLeft;
-    const parentRight = searchParents.parentRight;
-    const parentDown = searchParents.parentDown;
-
 
     if (!currentCell.state) {
       //update counters
       setTotalFilled(totalFilled => totalFilled + 1);
       setTotalEmpty(totalEmpty => totalEmpty - 1);
 
-      //any parents available
-      if (parentTop !== undefined || parentLeft !== undefined || 
-          parentRight !== undefined || parentDown !== undefined) {
-
-        if (countParents > 1) {
-          //merge islands
-          setTotalIslands(totalIslands => totalIslands - (countParents - 1));
-        }
-
-        //update parents  TO DO...
-        if (parentTop !== undefined && !parentTop.parent) {
-          updateParent(parentTop, currentCell);
-        }
-
-        currentIsland = currentCell.id;
-        haveParents = true;
-
-      } else {
-        //set new island
-        setTotalIslands(totalIslands => totalIslands + 1);
-        currentIsland = currentCell.id;
-      }
-
     } else {
       //update counters
       setTotalEmpty(totalEmpty => totalEmpty + 1);
       setTotalFilled(totalFilled => totalFilled - 1);
-
-      //delete island
-      currentIsland = null;
-      if (parentTop === undefined &&
-        parentLeft === undefined &&
-        parentRight === undefined &&
-        parentDown === undefined) {
-
-        setTotalIslands(totalIslands => totalIslands - 1);
-      }
     }
 
-    //update grid with currentCell
+    //the magic behind the countIsland
+    const process = processIslands(currentCell, searchParents, grid);
+
+    //update island counter
+    setTotalIslands(totalIsland => totalIsland + process.addParent + process.addIsland);
+
+    //update grid with currentCell + parents
     setGrid(grid.map((rows) =>
       rows.map((cols) =>
         cols.id === id ? {
           ...cols,
           state: !cols.state,
-          island: currentIsland,
-          parent: haveParents
+          island: currentCell.id,
+          parent: countParents > 0
         } : cols
       )
     ));
@@ -131,77 +96,14 @@ function App() {
 
   //get the cell with matching id
   const getCurrentCell = (id) => {
-    for (var i = 0; i < cols; i++) {
-      for (var j = 0; j < rows; j++) {
+    for (var i = 0; i < rows; i++) {
+      for (var j = 0; j < cols; j++) {
         if (grid[i][j].id === id) {
           return grid[i][j];
         }
       }
     }
     return;
-  }
-
-  //get the parent cell with matching id
-  const searchParentsCell = (id) => {
-    let parentTop;
-    let parentLeft;
-    let parentRight;
-    let parentDown;
-    let countParents = 0;
-
-    for (var i = 0; i < cols; i++) {
-      for (var j = 0; j < rows; j++) {
-        if (grid[i][j].id === id) {
-
-          //search up
-          if (grid[i][j - 1] !== undefined && grid[i][j - 1].state) {
-            console.log("search up")
-            parentTop = grid[i][j - 1];
-
-            if (!parentTop.parent) {
-              countParents++;
-            }
-          }
-          //search left
-          if (grid[i - 1][j] !== undefined && grid[i - 1][j].state) {
-            console.log("search left")
-            parentLeft = grid[i - 1][j];
-
-            if (!parentLeft.parent) {
-              countParents++;
-            }
-          }
-
-          //search right
-          if (grid[i + 1][j] !== undefined && grid[i + 1][j].state) {
-            console.log("search right")
-            parentRight = grid[i + 1][j];
-
-            if (!parentRight.parent) {
-              countParents++;
-            }
-          }
-
-          //search down
-          if (grid[i][j + 1] !== undefined && grid[i][j + 1].state) {
-            console.log("search down")
-            parentDown = grid[i][j + 1];
-
-            if (!parentDown.parent) {
-              countParents++;
-            }
-          }
-        }
-      }
-    }
-
-    return {
-      countParents,
-      parentTop,
-      parentLeft,
-      parentRight,
-      parentDown
-    };
   }
 
   //Update Cols
@@ -220,21 +122,6 @@ function App() {
 
     setRows(fieldValue);
     //createGrid();
-  }
-
-  //Update Parents
-  const updateParent = (parent, currentCell) => {
-    console.log("updateParent" + parent.id)
-    setGrid(grid.map((rows) =>
-      rows.map((cols) =>
-        cols.id === parent.id ? {
-          ...cols,
-          state: parent.state,
-          island: currentCell.id,
-          parent: true
-        } : cols
-      )
-    ));
   }
 
 
