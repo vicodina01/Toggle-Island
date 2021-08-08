@@ -135,7 +135,7 @@ function App() {
                 <span className="cell-empty-label">TOGGLE &nbsp;</span>
                 <span className="cell-filled-label">ISLAND</span>
               </Card.Title>
-              <Card.Subtitle className="text-muted">Bisto Test</Card.Subtitle>
+              <Card.Subtitle className="text-muted">Bitso Test</Card.Subtitle>
               <Grid gridInfo={grid} toggleCell={toggleCell}></Grid>
             </Card.Body>
             <Card.Footer>

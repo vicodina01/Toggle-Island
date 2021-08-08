@@ -180,24 +180,23 @@ export const processIslands = (currentCell, searchParents) => {
                 //add island
                 addIsland = 1;
                 addParent = 0;
-            } else if (haveAnyCrossParents) {
-                if ((parentLeft !== undefined && parentRight !== undefined) ||
-                    (parentTop !== undefined && parentDown !== undefined)) {
-                    //merge 2 islands
-                    addIsland = 1;
-                    addParent = -2;
-                }else{
-                    if ((parentLeft !== undefined && parentDown !== undefined) ||
-                    (parentTop !== undefined && parentRight !== undefined) ||
-                    (parentLeft !== undefined && parentTop !== undefined)||
-                    (parentDown !== undefined && parentRight !== undefined)){
-                        //merge 1 islands
-                        addIsland = 1;
-                        addParent = -1;
-                    }
-                }
+            }else if((parentTop !== undefined && parentTopRight === undefined && parentRight !== undefined) ||
+                (parentLeft !== undefined && parentDownLeft === undefined && parentDown !== undefined) ||       
+                (parentDown !== undefined && parentDownRight === undefined && parentRight !== undefined) ||
+                (parentLeft !== undefined && parentTopLeft === undefined && parentTop !== undefined)){
+                //merge 2 islands
+                addIsland = 1;
+                addParent = -2;
+            }else if ((parentLeft !== undefined && parentRight !== undefined) ||
+                (parentTop !== undefined && parentDown !== undefined)) {
+                //merge 2 islands
+                addIsland = 1;
+                addParent = -2;
+            }else {
+                //merge 1 islands
+                addIsland = 1;
+                addParent = -1;
             }
-            
             break;
         case 4:
             if (haveAllParents) {
@@ -212,21 +211,18 @@ export const processIslands = (currentCell, searchParents) => {
                 (parentLeft === undefined && parentRight === undefined && parentTop !== undefined && parentDown !== undefined)){
                 //merge 2 islands
                 addIsland = 1;
-                addParent = -2;
-                console.log("here1");
+                addParent = -2;               
             } else if((parentTop !== undefined && parentTopRight === undefined && parentRight !== undefined) ||
                 (parentLeft !== undefined && parentDownLeft === undefined && parentDown !== undefined) ||       
-                (parentDown !== undefined && parentDownRight === undefined && parentLeft !== undefined) ||
+                (parentDown !== undefined && parentDownRight === undefined && parentRight !== undefined) ||
                 (parentLeft !== undefined && parentTopLeft === undefined && parentTop !== undefined)){
                 //merge 2 islands
                 addIsland = 1;
-                addParent = -2;  
-                console.log("here2");         
+                addParent = -2;                        
             }else{
                 //merge 1 islands
                 addIsland = 1;
-                addParent = -1;
-                console.log("here3");
+                addParent = -1;                
             }
             break;
         case 5:
