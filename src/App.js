@@ -23,21 +23,33 @@ function App() {
   const [rows, setRows] = useState(15);
   const [cols, setCols] = useState(15);
   const [grid, setGrid] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const [totalFilled, setTotalFilled] = useState(0);
   const [totalEmpty, setTotalEmpty] = useState(0);
   const [totalIslands, setTotalIslands] = useState(0);
 
   useEffect(() => {
-    const createGrid = () => {
+    let url = "https://www.reddit.com/r/bitcoin.json";
+
+    const createGrid = (infoApi) => {
+
+      console.log(infoApi);
+
       const arr = new Array(rows);
       let countEmpty = 0;
       for (var i = 0; i < rows; i++) {
         arr[i] = new Array(cols);
+        let infoSplit = infoApi[i].data.id.split("");
+        console.log(infoSplit);
         for (var j = 0; j < cols; j++) {
           const newCell = { ...cell };
+
+          console.log(infoSplit[j]);
           arr[i][j] = newCell;
           arr[i][j].id = i + "_" + j;
+          arr[i][j].state = (infoSplit[j] !== undefined) ? (infoSplit[j] === 'a' || infoSplit[j] === 'e' || infoSplit[j] === 'i' || 
+          infoSplit[j] === 'o' || infoSplit[j] === 'u') ? false : true : null ;
           countEmpty++;
         }
       }
@@ -46,7 +58,21 @@ function App() {
       console.log(arr);
     }
 
-    createGrid();
+    const fetchData = async () => {
+      try {
+        const response = await fetch(url);
+        const json = await response.json();
+        console.log(json);
+        setLoading(false);
+        createGrid(json.data.children)
+
+      } catch (error) {
+        console.log("error", error);
+      }
+    };
+
+    fetchData();
+
 
   }, [rows, cols])
 
@@ -123,7 +149,14 @@ function App() {
     setRows(fieldValue);
     //createGrid();
   }
+  
+let loadGrid;
 
+if(loading){
+  loadGrid = <h3> loading..</h3>
+}else{ 
+  loadGrid= <Grid gridInfo={grid} toggleCell={toggleCell}></Grid>
+}
 
   return (
     <Container>
@@ -136,7 +169,7 @@ function App() {
                 <span className="cell-filled-label">ISLAND</span>
               </Card.Title>
               <Card.Subtitle className="text-muted">Bitso Test</Card.Subtitle>
-              <Grid gridInfo={grid} toggleCell={toggleCell}></Grid>
+              {loadGrid}
             </Card.Body>
             <Card.Footer>
               <Footer rows={rows} cols={cols}
